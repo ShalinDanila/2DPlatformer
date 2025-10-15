@@ -16,7 +16,8 @@ public class Health : MonoBehaviour
         maxHealth = Mathf.Max(1.0f, maxHealth);
         currentHealth = maxHealth;
     }
-    
+
+    // Getters
     public float GetCurrentHealth => currentHealth;
     public float GetMaxHealth => maxHealth;
     public bool IsDead => isDead;
@@ -25,9 +26,11 @@ public class Health : MonoBehaviour
     {
         if (isDead) return;
 
+        // Decrese health and call event
         currentHealth = Mathf.Max(currentHealth - damageAmount, 0);
         OnTakeDamage?.Invoke(damageAmount);
 
+        // Call die event 
         if (currentHealth <= 0.0f && !isDead)
         {
             isDead = true;
