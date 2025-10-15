@@ -2,44 +2,43 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    public event System.Action OnTakeDamage;
+    public event System.Action<float> OnTakeDamage;
     public event System.Action OnDie;
-    [SerializeField] private float maxHealth;
-    private GameObject owner;
+    
+    [SerializeField] private float maxHealth = 100.0f;
+    
     private float currentHealth;
     private bool isDead = false;
 
-    private void Start()
+    private void Awake()
     {
-        // Set owner
-        owner = gameObject;
-
-        // Set currentHealth equal to maxHealth
+        // Initialize health
+        maxHealth = Mathf.Max(1.0f, maxHealth);
         currentHealth = maxHealth;
     }
+    
+    public float GetCurrentHealth => currentHealth;
+    public float GetMaxHealth => maxHealth;
+    public bool IsDead => isDead;
 
-    private void OnDestroy()
-    {
-        OnTakeDamage = null;
-        OnDie = null;
-    }
-
-
-    public void OnTakeDamage_event(float damageAmount)
+    public void TakeDamage(float damageAmount)
     {
         if (isDead) return;
 
-        currentHealth -= damageAmount;
-        OnTakeDamage?.Invoke();
+        currentHealth = Mathf.Max(currentHealth - damageAmount, 0);
+        OnTakeDamage?.Invoke(damageAmount);
 
-        if (currentHealth <= 0.0f)
+        if (currentHealth <= 0.0f && !isDead)
         {
+            isDead = true;
             OnDie?.Invoke();
         }
     }
-
-    public float GetCurrentHealth()
+    
+    public void Heal(float healAmount)
     {
-        return currentHealth;
+        if (isDead) return;
+
+        currentHealth = Mathf.Min(currentHealth + healAmount, maxHealth);
     }
 }
